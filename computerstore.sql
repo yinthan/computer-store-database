@@ -180,7 +180,7 @@ CREATE TABLE Purchases_Computer_Customer(
 	Customer ID			CHAR(50),
 	OrderID			    INTEGER,
 	PRIMARY KEY(Computer_Model_Name, Customer_ID, OrderID),
-	FORIEGN KEY(Computer_Model Name) REFERENCES
+	FORIEGN KEY(Computer_Model_Name) REFERENCES
     Connects_Motherboard_Computer,
 			ON DELETE NO ACTION
 			ON UPDATE CASCADE
