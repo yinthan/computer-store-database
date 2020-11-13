@@ -125,66 +125,66 @@ FOREIGN KEY(Computer Model Name) REFERENCES Computer
 -- Customer / Computer
 
 CREATE TABLE Customer(
-	Customer ID		INTEGER	PRIMARY KEY,
+	Customer_ID		INTEGER	PRIMARY KEY,
 	Name			CHAR(50)	NOT NULL,
 	Email			CHAR(50)	NOT NULL,
-	Phone Number	INTEGER	NOT NULL
+	Phone           Number	INTEGER	NOT NULL
 )
 
 -- Note: Changed Milliamps attribute to Capacity
 CREATE TABLE Battery(
-	Battery Model Name	CHAR(50)	PRIMARY KEY,
-	Brand			CHAR(20),	NOT NULL,
-	Capacity		FLOAT		NOT NULL,
-	Price			FLOAT		NOT NULL
+	Battery_Model_Name	CHAR(50)	PRIMARY KEY,
+	Brand			    CHAR(20),	NOT NULL,
+	Capacity		    FLOAT		NOT NULL,
+	Price			    FLOAT		NOT NULL
 )
 
 CREATE TABLE GPU(
-	GPU Model Name 	CHAR(50)	PRIMARY KEY,
+	GPU_Model_Name 	CHAR(50)	PRIMARY KEY,
 	Brand 			CHAR(50),	NOT NULL,
-	CUDA core		INTEGER	NOT NULL,
+	CUDA_core		INTEGER	NOT NULL,
 	Frequency		FLOAT		NOT NULL,
 	Price			FLOAT		NOT NULL
 )
 
 CREATE TABLE GPU_CUDACore(
-	CUDA core			INTEGER	PRIMARY KEY,
+	CUDA_core			INTEGER	PRIMARY KEY,
 	Frequency			FLOAT 	NOT NULL
 )
 
 
 CREATE TABLE GPU_Model(
-	GPU Model Name 	CHAR(50)	PRIMARY KEY,
+	GPU_Model_Name 	CHAR(50)	PRIMARY KEY,
 	Brand 			CHAR(50),	NOT NULL,
-	CUDA core		INTEGER	NOT NULL,
+	CUDA_core		INTEGER	NOT NULL,
 	Price			FLOAT		NOT NULL
 )
 
 -- Note: There is a total participation from GPU to Mounts which means GPU Model Name cannot be null but since GPU Model Name is a PK, NOT NULL is not required.
 CREATE TABLE Mounts_GPU_Computer(
-	Computer Model Name	CHAR(50),
-	GPU Model Name		CHAR(50),
-	PRIMARY KEY(Computer Model Name, GPU Model Name),
-	FOREIGN KEY(Computer Model Name) REFERENCES
+	Computer_Model_Name	    CHAR(50),
+	GPU_Model_Name		    CHAR(50),
+	PRIMARY KEY(Computer_Model_Name, GPU_Model_Name),
+	FOREIGN KEY(Computer_Model_Name) REFERENCES
     Connects_Motherboard_Computer
 			ON DELETE NO ACTION
 			ON UPDATE CASCADE
-	FOREIGN KEY(GPU Model Name) REFERENCES GPU
+	FOREIGN KEY(GPU_Model_Name) REFERENCES GPU
     ON DELETE NO ACTION
 			ON UPDATE CASCADE
 )
 
 -- Note: There is a total participation from Customer to Purchases which means CustomerID cannot be null but since CustomerID is a PK, NOT NULL is not required.
 CREATE TABLE Purchases_Computer_Customer(
-	Computer Model Name	CHAR(50),
+	Computer Model_Name	CHAR(50),
 	Customer ID			CHAR(50),
-	OrderID			INTEGER,
-	PRIMARY KEY(Computer Model Name, Customer ID, OrderID),
-	FORIEGN KEY(Computer Model Name) REFERENCES
+	OrderID			    INTEGER,
+	PRIMARY KEY(Computer_Model_Name, Customer_ID, OrderID),
+	FORIEGN KEY(Computer_Model Name) REFERENCES
     Connects_Motherboard_Computer,
 			ON DELETE NO ACTION
 			ON UPDATE CASCADE
-	FOREIGN KEY(Customer ID) REFERENCES Customer
+	FOREIGN KEY(Customer_ID) REFERENCES Customer
 		ON DELETE NO ACTION
 		ON UPDATE CASCADE
 )
@@ -192,27 +192,27 @@ CREATE TABLE Purchases_Computer_Customer(
 -- Note: There is a total participation from Customer to Purchases which means CustomerID cannot be null but since CustomerID is a PK, NOT NULL is not required.
 
 CREATE TABLE Purchases_Accessory_Customer(
-	Accessories Model Name	CHAR(50),
-	Customer ID			CHAR(50),
-	OrderID			INTEGER,
-	PRIMARY KEY(Accessories Model Name, Customer ID, OrderID),
-	FORIEGN KEY(Accessories Model Name) REFERENCES Accessory
+	Accessories_Model_Name	CHAR(50),
+	Customer_ID			    CHAR(50),
+	OrderID			        INTEGER,
+	PRIMARY KEY(Accessories_Model_Name, Customer_ID, OrderID),
+	FORIEGN KEY(Accessories_Model_Name) REFERENCES Accessory
 		ON DELETE NO ACTION
 		ON UPDATE CASCADE
-	FOREIGN KEY(Customer ID) REFERENCES Customer
+	FOREIGN KEY(Customer_ID) REFERENCES Customer
 		ON DELETE NO ACTION
 		ON UPDATE CASCADE
 )
 
 CREATE TABLE Powers_Battery_Computer(
-	Computer Model Name	CHAR(50),
-	Battery Model Name		CHAR(50),
-	PRIMARY KEY(Computer Model Name, Battery Model Name),
-	FORIEGN KEY(Computer Model Name) REFERENCES
+	Computer_Model_Name	    CHAR(50),
+	Battery_Model_Name		CHAR(50),
+	PRIMARY KEY(Computer_Model_Name, Battery_Model_Name),
+	FORIEGN KEY(Computer_Model_Name) REFERENCES
     Connects_Motherboard_Computer
 			ON DELETE NO ACTION
 			ON UPDATE CASCADE
-    FORIEGN KEY(Battery Model Name) REFERENCES Battery
+    FORIEGN KEY(Battery_Model_Name) REFERENCES Battery
 		ON DELETE NO ACTION
 		ON UPDATE CASCADE
 )
@@ -221,25 +221,25 @@ CREATE TABLE Powers_Battery_Computer(
 
 CREATE TABLE Accessory(
 	Accessory_Model_Name	CHAR(50)	PRIMARY KEY,
-	Brand				CHAR(20)	NOT NULL,
-	Price 				FLOAT		NOT NULL
+	Brand				    CHAR(20)	NOT NULL,
+	Price 				    FLOAT		NOT NULL
 )
 
 CREATE TABLE Monitor(
 	Accessory_Model_Name	CHAR(50)	PRIMARY KEY,
-	Refresh Rate			CHAR(20)	NOT NULL,
-	Resolution			CHAR(20)	NOT NULL,
-	FOREIGN KEY (Accessory Model Name)
+	Refresh_Rate			CHAR(20)	NOT NULL,
+	Resolution			    CHAR(20)	NOT NULL,
+	FOREIGN KEY (Accessory_Model_Name)
     REFERENCES Accessory
     ON DELETE CASCADE
     ON UPDATE CASCADE
 )
 
 CREATE TABLE Keyboard(
-	Accessory Model Name	CHAR(50)	PRIMARY KEY,
-	Connection Type		CHAR(20)	NOT NULL,
-	Power Source			CHAR(20)	NOT NULL,
-	Size				CHAR(20)	NOT NULL,
+	Accessory_Model_Name	CHAR(50)	PRIMARY KEY,
+	Connection_Type		    CHAR(20)	NOT NULL,
+	Power_Source			CHAR(20)	NOT NULL,
+	Size				    CHAR(20)	NOT NULL,
 	FOREIGN KEY (Accessory Model Name)
     REFERENCES Accessory
     ON DELETE CASCADE
@@ -247,11 +247,11 @@ CREATE TABLE Keyboard(
 )
 
 Create Table Mouse(
-	Accessory Model Name	CHAR(50)	PRIMARY KEY,
-	Sensor Type			CHAR(20)	NOT NULL,
-	Connection Type		CHAR(20)	NOT NULL,
-	Power Source			CHAR(20)	NOT NULL,
-	FOREIGN KEY (Accessory Model Name)
+	Accessory_Model_Name    CHAR(50)	PRIMARY KEY,
+	Sensor_Type			    CHAR(20)	NOT NULL,
+	Connection_Type		CHAR(20)	NOT NULL,
+	Power_Source			CHAR(20)	NOT NULL,
+	FOREIGN KEY (Accessory_Model_Name)
     REFERENCES Accessory
     ON DELETE CASCADE
 	ON UPDATE CASCADE
