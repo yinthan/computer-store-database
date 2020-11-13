@@ -176,8 +176,8 @@ CREATE TABLE Mounts_GPU_Computer(
 
 -- Note: There is a total participation from Customer to Purchases which means CustomerID cannot be null but since CustomerID is a PK, NOT NULL is not required.
 CREATE TABLE Purchases_Computer_Customer(
-	Computer Model_Name	CHAR(50),
-	Customer ID			CHAR(50),
+	Computer_Model_Name	CHAR(50),
+	Customer_ID			CHAR(50),
 	OrderID			    INTEGER,
 	PRIMARY KEY(Computer_Model_Name, Customer_ID, OrderID),
 	FORIEGN KEY(Computer_Model_Name) REFERENCES
@@ -240,7 +240,7 @@ CREATE TABLE Keyboard(
 	Connection_Type		    CHAR(20)	NOT NULL,
 	Power_Source			CHAR(20)	NOT NULL,
 	Size				    CHAR(20)	NOT NULL,
-	FOREIGN KEY (Accessory Model Name)
+	FOREIGN KEY (Accessory_Model_Name)
     REFERENCES Accessory
     ON DELETE CASCADE
     ON UPDATE CASCADE
