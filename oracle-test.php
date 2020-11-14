@@ -155,7 +155,7 @@
 
             // Your username is ora_(CWL_ID) and the password is a(student number). For example, 
 			// ora_platypus is the username and a12345678 is the password.
-            $db_conn = OCILogon("username", "password", "dbhost.students.cs.ubc.ca:1522/stu");
+            $db_conn = OCILogon("ora_davidw7", "a14496160", "dbhost.students.cs.ubc.ca:1522/stu");
 
             if ($db_conn) {
                 debugAlertMessage("Database is Connected");
@@ -193,7 +193,8 @@
 
             // Create new table
             echo "<br> creating new table <br>";
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
+
+            // Computer and Motherboard DDLs
             executePlainSQL("CREATE TABLE Motherboard(
                 Motherboard_Model_Name CHAR(20) PRIMARY KEY, 
                 Price FLOAT NOT NULL
@@ -204,14 +205,207 @@
 	            Frequency			FLOAT		NOT NULL,
 	            Core				INTEGER	    NOT NULL
             )");
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
+            executePlainSQL("CREATE TABLE RAM(
+                RAM_Model_Name		CHAR(20)	PRIMARY KEY,
+                Price 				FLOAT		NOT NULL,
+                Frequency			FLOAT		NOT NULL,
+                Memory_Types		CHAR(20)	NOT NULL,
+                Size				INTEGER	    NOT NULL
+            )");
+            executePlainSQL("CREATE TABLE RAM_Memory(
+                Memory_Types		CHAR(20)	PRIMARY KEY,
+                Frequency			FLOAT 	    NOT NULL
+            )");
+            executePlainSQL("CREATE TABLE RAM_Model(
+                RAM_Model_Name		CHAR(20)	PRIMARY KEY,
+                Price 				FLOAT		NOT NULL,
+                Memory_Types		CHAR(20)	NOT NULL,
+                Size				INTEGER	    NOT NULL,
+                FOREIGN KEY (Memory_Types) REFERENCES RAM_Memory
+                    ON DELETE CASCADE
+            )");
+            executePlainSQL("CREATE TABLE Storage(
+                Storage_Model_Name	CHAR(20)	PRIMARY KEY,
+                Price 				FLOAT		NOT NULL,
+                Size				INTEGER	NOT NULL
+            )");
+            executePlainSQL("CREATE TABLE HDD(
+                Storage_Model_Name		CHAR(20)	PRIMARY KEY,
+                RPM				        INTEGER 	NOT NULL,
+                FOREIGN KEY (Storage_Model_Name) REFERENCES Storage
+                    ON DELETE CASCADE
+            )");
+            executePlainSQL("CREATE TABLE SSD(
+                Storage_Model_Name		 CHAR(20)	PRIMARY KEY,
+                Interface			     CHAR(20)	NOT NULL,
+                FOREIGN KEY (Storage_Model_Name) REFERENCES Storage
+                    ON DELETE CASCADE
+            )");
+            executePlainSQL("CREATE TABLE Mounts_Storage_Motherboard(
+                Storage_Model_Name 		 CHAR(20),
+                Motherboard_Model_Name	 CHAR(20),
+                PRIMARY KEY(Storage_Model_Name, Motherboard_Model_Name),
+                FOREIGN KEY(Storage_Model_Name) REFERENCES Storage,
+                FOREIGN KEY(Motherboard_Model_Name) REFERENCES Motherboard
+                    ON DELETE CASCADE
+            )");
+
+            executePlainSQL("CREATE TABLE Controls_CPU_Motherboard(
+                CPU_Model_Name 		     CHAR(20),
+                Motherboard_Model_Name	 CHAR(20),
+                PRIMARY KEY(CPU_Model_Name, Motherboard_Model_Name),
+                FOREIGN KEY(CPU_Model_Name) REFERENCES CPU,
+                FOREIGN KEY(Motherboard_Model_Name) REFERENCES Motherboard
+                    ON DELETE NO ACTION
+            )");
+            executePlainSQL("CREATE TABLE Inserts_RAM_Motherboard(
+                RAM_Model_Name 		     CHAR(20),
+                Motherboard_Model_Name	 CHAR(20),
+                PRIMARY KEY(RAM_Model_Name, Motherboard_Model_Name),
+                FOREIGN KEY(RAM_Model_Name) REFERENCES RAM,
+                FOREIGN KEY(Motherboard_Model_Name) REFERENCES Motherboard
+                    ON DELETE NO ACTION
+            )");
+            executePlainSQL("CREATE TABLE Connects_Motherboard_Computer(
+                Motherboard_Model_Name	 CHAR(20),
+                Computer_Model_Name	     CHAR(20),
+                Operating_System		 CHAR(20)		NOT NULL,
+                Size				     CHAR(20)		NOT NULL,
+                Price				     FLOAT		    NOT NULL,
+                PRIMARY KEY(Motherboard_Model_Name, Computer_Model_Name),
+                FOREIGN KEY(Motherboard_Model_Name) REFERENCES Motherboard
+                    ON DELETE NO ACTION,
+                FOREIGN KEY(Computer_Model_Name) REFERENCES Computer
+                    ON DELETE NO ACTION
+            )");
             
+            // Customer SQL DDLs
+            executePlainSQL("CREATE TABLE Customer(
+                Customer_ID		INTEGER	    PRIMARY KEY,
+                Full_Name		CHAR(50)	NOT NULL,
+                Email			CHAR(50)	NOT NULL
+            )");
+            executePlainSQL("CREATE TABLE GPU(
+                GPU_Model_Name 	CHAR(50)	PRIMARY KEY,
+                CUDA_core		INTEGER	NOT NULL,
+                Frequency		FLOAT		NOT NULL,
+                Price			FLOAT		NOT NULL
+            )");
+            executePlainSQL("CREATE TABLE GPU_CUDACore(
+                CUDA_core			INTEGER	PRIMARY KEY,
+                Frequency			FLOAT 	NOT NULL
+            )");
+            executePlainSQL("CREATE TABLE GPU_Model(
+                GPU_Model_Name 	CHAR(50)	PRIMARY KEY,
+                CUDA_core		INTEGER	NOT NULL,
+                Price			FLOAT		NOT NULL,
+                FOREIGN KEY (CUDA_core) REFERENCES GPU_CUDACore
+                    ON DELETE CASCADE
+            )");
+            executePlainSQL("CREATE TABLE Mounts_GPU_Computer(
+                Computer_Model_Name	    CHAR(50),
+                GPU_Model_Name		    CHAR(50),
+                PRIMARY KEY(Computer_Model_Name, GPU_Model_Name),
+                FOREIGN KEY(Computer_Model_Name) REFERENCES Connects_Motherboard_Computer
+                    ON DELETE NO ACTION,
+                FOREIGN KEY(GPU_Model_Name) REFERENCES GPU
+                    ON DELETE NO ACTION
+            )");
+            executePlainSQL("CREATE TABLE Purchases_Computer_Customer(
+                Computer_Model_Name	CHAR(50),
+                Customer_ID			CHAR(50),
+                OrderID			    INTEGER,
+                PRIMARY KEY(Computer_Model_Name, Customer_ID, OrderID),
+                FOREIGN KEY(Computer_Model_Name) REFERENCES Connects_Motherboard_Computer
+                    ON DELETE NO ACTION,
+                FOREIGN KEY(Customer_ID) REFERENCES Customer
+                    ON DELETE NO ACTION
+            )");
+            executePlainSQL("CREATE TABLE Purchases_Accessory_Customer(
+                Accessories_Model_Name	CHAR(50),
+                Customer_ID			    CHAR(50),
+                OrderID			        INTEGER,
+                PRIMARY KEY(Accessories_Model_Name, Customer_ID, OrderID),
+                FOREIGN KEY(Accessories_Model_Name) REFERENCES Accessory
+                    ON DELETE NO ACTION,
+                FOREIGN KEY(Customer_ID) REFERENCES Customer
+                    ON DELETE NO ACTION
+            )");
+            
+            
+            // Accessories DDLs
+            executePlainSQL("CREATE TABLE Accessory(
+                Accessory_Model_Name	CHAR(50)	PRIMARY KEY,
+                Price 				    FLOAT		NOT NULL
+            )");
+
+            executePlainSQL("CREATE TABLE Monitor(
+                Accessory_Model_Name	CHAR(50)	PRIMARY KEY,
+                Refresh_Rate			CHAR(20)	NOT NULL,
+                Resolution			    CHAR(20)	NOT NULL,
+                FOREIGN KEY (Accessory_Model_Name) REFERENCES Accessory
+                    ON DELETE CASCADE
+            )");
+
+            executePlainSQL("CREATE TABLE Mouse(
+                Accessory_Model_Name    CHAR(50)	PRIMARY KEY,
+                Sensor_Type			    CHAR(20)	NOT NULL,
+                Connection_Type		    CHAR(20)	NOT NULL,
+                FOREIGN KEY (Accessory_Model_Name) REFERENCES Accessory
+                    ON DELETE CASCADE
+            )");
+
+
+
+
+            // Inserting tuples to computer / motherboard
+            executePlainSQL("INSERT INTO Motherboard VALUES ("Asus ROG Strix B450-F", 175)");
+            executePlainSQL("INSERT INTO Motherboard VALUES ("Asus ROG Strix Z490-E", 384)");
+            executePlainSQL("INSERT INTO Motherboard VALUES ("Asus Prime Z390-A", 228)");
+            executePlainSQL("INSERT INTO Motherboard VALUES ("MSI Creator TRX40 Motherboard", 945)");
+            executePlainSQL("INSERT INTO Motherboard VALUES ("GIGABYTE Z490 AORUS Master", 516)");
+
+            executePlainSQL("INSERT INTO CPU VALUES ("CPU_Model_Name", Price, Frequency, Core)");
+            
+
+            executePlainSQL("INSERT INTO RAM VALUES ("RAM_Model_Name", Price, Frequency, Memory_Types, Size)");
+            
+
+            
+            
+
+            // Inserting tuples to customer table
+            executePlainSQL("INSERT INTO Customer VALUES (1,"Bob", "bob@gmail.com")");
+            executePlainSQL("INSERT INTO Customer VALUES (2,"Alex", "alex@gmail.com")");
+            executePlainSQL("INSERT INTO Customer VALUES (3,"Charlie", "charlie@gmail.com")");
+            executePlainSQL("INSERT INTO Customer VALUES (4,"Mary", "mary@gmail.com")");
+            executePlainSQL("INSERT INTO Customer VALUES (5,"Sara", "sara@gmail.com")");
+
+            // Inserting tuples to gpu table
+            executePlainSQL("INSERT INTO GPU VALUES ("Asus GeForceGTX 1080 Ti 11GB STRIX",3584, "Sara", "sara@gmail.com")");
+
+            // Inserting tuples to accessory
+            executePlainSQL("INSERT INTO Accessory VALUES ("Microsoft Wireless Mobile Microsoft 15.95 Mouse 1850 -Black- U7Z-00002", "Microsoft", "15.95")");
+            executePlainSQL("INSERT INTO Accessory VALUES ("Razer DeathAdder Essential Gaming Mouse: 6400 DPI Optical Sensor - 5 Programmable Buttons - Rubber Side Grips - Classic Black", "Razer", "39.99")");
+            executePlainSQL("INSERT INTO Accessory VALUES ("Apple Pro Display XDR Standard Glass", "Apple", "6499")");
+            executePlainSQL("INSERT INTO Accessory VALUES ("Apple Pro Display XDR Nano-texture glass", "Apple", "7499")");
+            executePlainSQL("INSERT INTO Accessory VALUES ("Apple Magic Keyboard", "Apple", "99")");
+
+            // Inserting tuples to Monitor
+            executePlainSQL("INSERT INTO Monitor VALUES ("Dell 27 Inch 4k Monitor 2020", "120 Hz", "4k")");
+            executePlainSQL("INSERT INTO Monitor VALUES ("Apple Pro Display XDR Standard Glass", "60 Hz", "6k")");
+            executePlainSQL("INSERT INTO Monitor VALUES ("Apple Pro Display XDR Nano-texture glass", "60 Hz", "6k")");
+            executePlainSQL("INSERT INTO Monitor VALUES ("Samsung Ultra 8k Monitor 2020", "120 Hz", "8k")");
+            executePlainSQL("INSERT INTO Monitor VALUES ("Asus 4k Pro Monitor", "120 Hz", "4k")");
+
+            // Inserting tuples to Mouse
+            executePlainSQL("INSERT INTO Mouse VALUES ("Microsoft Wireless Mobile Mouse 1850 - Black - U7Z-00002", "Laser", "USB Wireless")");
+            executePlainSQL("INSERT INTO Mouse VALUES ("Razer DeathAdder Essential Gaming Mouse: 6400 DPI Optical Sensor - 5 Programmable Buttons - Rubber Side Grips - Classic Black", "Optical", "Wired")");
+            executePlainSQL("INSERT INTO Mouse VALUES ("Apple Magic Mouse", "Optical", "Wireless")");
+            executePlainSQL("INSERT INTO Mouse VALUES ("Logitech Gaming Mouse", "Laser", "Wired")");
+            executePlainSQL("INSERT INTO Mouse VALUES ("Asus Ultimate Gaming Mice", "Optical", "USB Wireless")");
+
+            // Inserting tuples to accessories relationships
             OCICommit($db_conn);
         }
 

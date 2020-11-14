@@ -89,8 +89,8 @@ CREATE TABLE Inserts_RAM_Motherboard(
 CREATE TABLE Connects_Motherboard_Computer(
     Motherboard_Model_Name	 CHAR(20),
     Computer_Model_Name	     CHAR(20),
-    Operating_System		 CHAR(20),		NOT NULL,
-	Chassis_Brand		     CHAR(20),		NOT NULL,
+    Operating_System		 CHAR(20)		NOT NULL,
+	Chassis_Brand		     CHAR(20)		NOT NULL,
 	Size				     CHAR(20)		NOT NULL,
 	Price				     FLOAT		    NOT NULL,
 	PRIMARY KEY(Motherboard_Model_Name, Computer_Model_Name),
@@ -191,7 +191,7 @@ CREATE TABLE Monitor(
         ON UPDATE CASCADE
 )
 
-Create Table Mouse(
+CREATE TABLE Mouse(
 	Accessory_Model_Name    CHAR(50)	PRIMARY KEY,
 	Sensor_Type			    CHAR(20)	NOT NULL,
 	Connection_Type		    CHAR(20)	NOT NULL,
