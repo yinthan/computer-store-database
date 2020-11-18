@@ -87,7 +87,7 @@ CREATE TABLE Inserts_RAM_Motherboard(
 )
 
 CREATE TABLE Connects_Motherboard_Computer(
-    Motherboard_Model_Name	 CHAR(20),
+    Motherboard_Model_Name	 CHAR(20)		NOT NULL,
     Computer_Model_Name	     CHAR(20),
     Operating_System		 CHAR(20)		NOT NULL,
 	Chassis_Brand		     CHAR(20)		NOT NULL,
@@ -96,10 +96,7 @@ CREATE TABLE Connects_Motherboard_Computer(
 	PRIMARY KEY(Motherboard_Model_Name, Computer_Model_Name),
 	FOREIGN KEY(Motherboard_Model_Name) REFERENCES Motherboard
 		ON DELETE NO ACTION
-        ON UPDATE CASCADE,
-    FOREIGN KEY(Computer_Model_Name) REFERENCES Computer
-		ON DELETE NO ACTION
-		ON UPDATE CASCADE
+        ON UPDATE CASCADE
 )
 
 -- Customer / Computer
