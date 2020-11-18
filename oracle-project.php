@@ -25,7 +25,7 @@
         <h2>Reset</h2>
         <p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
 
-        <form method="POST" action="oracle-test.php">
+        <form method="POST" action="oracle-tut.php">
             <!-- if you want another page to load after the button is clicked, you have to specify that page in the action parameter -->
             <input type="hidden" id="resetTablesRequest" name="resetTablesRequest">
             <p><input type="submit" value="Reset" name="reset"></p>
@@ -34,7 +34,7 @@
         <hr />
 
         <h2>Insert Values into DemoTable</h2>
-        <form method="POST" action="oracle-test.php"> <!--refresh page when submitted-->
+        <form method="POST" action="oracle-tut.php"> <!--refresh page when submitted-->
             <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
             Number: <input type="text" name="insNo"> <br /><br />
             Name: <input type="text" name="insName"> <br /><br />
@@ -47,7 +47,7 @@
         <h2>Update Name in DemoTable</h2>
         <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
 
-        <form method="POST" action="oracle-test.php"> <!--refresh page when submitted-->
+        <form method="POST" action="oracle-tut.php"> <!--refresh page when submitted-->
             <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
             Old Name: <input type="text" name="oldName"> <br /><br />
             New Name: <input type="text" name="newName"> <br /><br />
@@ -58,7 +58,7 @@
         <hr />
 
         <h2>Count the Tuples in DemoTable</h2>
-        <form method="GET" action="oracle-test.php"> <!--refresh page when submitted-->
+        <form method="GET" action="oracle-tut.php"> <!--refresh page when submitted-->
             <input type="hidden" id="countTupleRequest" name="countTupleRequest">
             <input type="submit" name="countTuples"></p>
         </form>
@@ -190,12 +190,12 @@
             global $db_conn;
             // Drop old table
             executePlainSQL("DROP TABLE demoTable");
+            // TODO: Drop all the table that was created
 
             // Create new table
             echo "<br> creating new table <br>";
-
-            // Computer and Motherboard DDLs
-            executePlainSQL("CREATE TABLE Motherboard(
+             // Computer and Motherboard DDLs
+             executePlainSQL("CREATE TABLE Motherboard(
                 Motherboard_Model_Name CHAR(20) PRIMARY KEY, 
                 Price FLOAT NOT NULL
             )");
@@ -354,58 +354,51 @@
                 FOREIGN KEY (Accessory_Model_Name) REFERENCES Accessory
                     ON DELETE CASCADE
             )");
-
-
-
+            
+            //TODO: Remember FK must refer to a existing value in the parent table
 
             // Inserting tuples to computer / motherboard
-            executePlainSQL("INSERT INTO Motherboard VALUES ("Asus ROG Strix B450-F", 175)");
-            executePlainSQL("INSERT INTO Motherboard VALUES ("Asus ROG Strix Z490-E", 384)");
-            executePlainSQL("INSERT INTO Motherboard VALUES ("Asus Prime Z390-A", 228)");
-            executePlainSQL("INSERT INTO Motherboard VALUES ("MSI Creator TRX40 Motherboard", 945)");
-            executePlainSQL("INSERT INTO Motherboard VALUES ("GIGABYTE Z490 AORUS Master", 516)");
+            executePlainSQL("INSERT INTO Motherboard VALUES ('Asus ROG Strix B450-F', 175)");
+            executePlainSQL("INSERT INTO Motherboard VALUES ('Asus ROG Strix Z490-E', 384)");
+            executePlainSQL("INSERT INTO Motherboard VALUES ('Asus Prime Z390-A', 228)");
+            executePlainSQL("INSERT INTO Motherboard VALUES ('MSI Creator TRX40 Motherboard', 945)");
+            executePlainSQL("INSERT INTO Motherboard VALUES ('GIGABYTE Z490 AORUS Master', 516)");
 
-            executePlainSQL("INSERT INTO CPU VALUES ("CPU_Model_Name", Price, Frequency, Core)");
+            executePlainSQL("INSERT INTO CPU VALUES ('CPU_Model_Name', Price, Frequency, Core)");
             
-
-            executePlainSQL("INSERT INTO RAM VALUES ("RAM_Model_Name", Price, Frequency, Memory_Types, Size)");
+            executePlainSQL("INSERT INTO RAM VALUES ('RAM_Model_Name', Price, Frequency, Memory_Types, Size)");
             
-
-            
-            
-
             // Inserting tuples to customer table
-            executePlainSQL("INSERT INTO Customer VALUES (1,"Bob", "bob@gmail.com")");
-            executePlainSQL("INSERT INTO Customer VALUES (2,"Alex", "alex@gmail.com")");
-            executePlainSQL("INSERT INTO Customer VALUES (3,"Charlie", "charlie@gmail.com")");
-            executePlainSQL("INSERT INTO Customer VALUES (4,"Mary", "mary@gmail.com")");
-            executePlainSQL("INSERT INTO Customer VALUES (5,"Sara", "sara@gmail.com")");
+            executePlainSQL("INSERT INTO Customer VALUES (1,'Bob', 'bob@gmail.com')");
+            executePlainSQL("INSERT INTO Customer VALUES (2,'Alex', 'alex@gmail.com')");
+            executePlainSQL("INSERT INTO Customer VALUES (3,'Charlie', 'charlie@gmail.com')");
+            executePlainSQL("INSERT INTO Customer VALUES (4,'Mary', 'mary@gmail.com')");
+            executePlainSQL("INSERT INTO Customer VALUES (5,'Sara', 'sara@gmail.com')");
 
             // Inserting tuples to gpu table
-            executePlainSQL("INSERT INTO GPU VALUES ("Asus GeForceGTX 1080 Ti 11GB STRIX",3584, "Sara", "sara@gmail.com")");
+            executePlainSQL("INSERT INTO GPU VALUES ('Asus GeForceGTX 1080 Ti 11GB STRIX',3584, 'Sara', 'sara@gmail.com')");
 
             // Inserting tuples to accessory
-            executePlainSQL("INSERT INTO Accessory VALUES ("Microsoft Wireless Mobile Microsoft 15.95 Mouse 1850 -Black- U7Z-00002", "Microsoft", "15.95")");
-            executePlainSQL("INSERT INTO Accessory VALUES ("Razer DeathAdder Essential Gaming Mouse: 6400 DPI Optical Sensor - 5 Programmable Buttons - Rubber Side Grips - Classic Black", "Razer", "39.99")");
-            executePlainSQL("INSERT INTO Accessory VALUES ("Apple Pro Display XDR Standard Glass", "Apple", "6499")");
-            executePlainSQL("INSERT INTO Accessory VALUES ("Apple Pro Display XDR Nano-texture glass", "Apple", "7499")");
-            executePlainSQL("INSERT INTO Accessory VALUES ("Apple Magic Keyboard", "Apple", "99")");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Microsoft Wireless Mobile Microsoft 15.95 Mouse 1850 -Black- U7Z-00002', 'Microsoft', '15.95')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Razer DeathAdder Essential Gaming Mouse: 6400 DPI Optical Sensor - 5 Programmable Buttons - Rubber Side Grips - Classic Black', 'Razer', '39.99')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Pro Display XDR Standard Glass', 'Apple', '6499')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Pro Display XDR Nano-texture glass', 'Apple', '7499')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Magic Keyboard', 'Apple, '99')");
 
             // Inserting tuples to Monitor
-            executePlainSQL("INSERT INTO Monitor VALUES ("Dell 27 Inch 4k Monitor 2020", "120 Hz", "4k")");
-            executePlainSQL("INSERT INTO Monitor VALUES ("Apple Pro Display XDR Standard Glass", "60 Hz", "6k")");
-            executePlainSQL("INSERT INTO Monitor VALUES ("Apple Pro Display XDR Nano-texture glass", "60 Hz", "6k")");
-            executePlainSQL("INSERT INTO Monitor VALUES ("Samsung Ultra 8k Monitor 2020", "120 Hz", "8k")");
-            executePlainSQL("INSERT INTO Monitor VALUES ("Asus 4k Pro Monitor", "120 Hz", "4k")");
+            executePlainSQL("INSERT INTO Monitor VALUES ('Dell 27 Inch 4k Monitor 2020', '120 Hz', '4k')");
+            executePlainSQL("INSERT INTO Monitor VALUES ('Apple Pro Display XDR Standard Glass', '60 Hz', '6k')");
+            executePlainSQL("INSERT INTO Monitor VALUES ('Apple Pro Display XDR Nano-texture glass', '60 Hz', '6k')");
+            executePlainSQL("INSERT INTO Monitor VALUES ('Samsung Ultra 8k Monitor 2020', '120 Hz', '8k')");
+            executePlainSQL("INSERT INTO Monitor VALUES ('Asus 4k Pro Monitor', '120 Hz', '4k')");
 
             // Inserting tuples to Mouse
-            executePlainSQL("INSERT INTO Mouse VALUES ("Microsoft Wireless Mobile Mouse 1850 - Black - U7Z-00002", "Laser", "USB Wireless")");
-            executePlainSQL("INSERT INTO Mouse VALUES ("Razer DeathAdder Essential Gaming Mouse: 6400 DPI Optical Sensor - 5 Programmable Buttons - Rubber Side Grips - Classic Black", "Optical", "Wired")");
-            executePlainSQL("INSERT INTO Mouse VALUES ("Apple Magic Mouse", "Optical", "Wireless")");
-            executePlainSQL("INSERT INTO Mouse VALUES ("Logitech Gaming Mouse", "Laser", "Wired")");
-            executePlainSQL("INSERT INTO Mouse VALUES ("Asus Ultimate Gaming Mice", "Optical", "USB Wireless")");
+            executePlainSQL("INSERT INTO Mouse VALUES ('Microsoft Wireless Mobile Mouse 1850 - Black - U7Z-00002', 'Laser', 'USB Wireless')");
+            executePlainSQL("INSERT INTO Mouse VALUES ('Razer DeathAdder Essential Gaming Mouse: 6400 DPI Optical Sensor - 5 Programmable Buttons - Rubber Side Grips - Classic Black', 'Optical', 'Wired')");
+            executePlainSQL("INSERT INTO Mouse VALUES ('Apple Magic Mouse', 'Optical', 'Wireless')");
+            executePlainSQL("INSERT INTO Mouse VALUES ('Logitech Gaming Mouse', 'Laser', 'Wired')");
+            executePlainSQL("INSERT INTO Mouse VALUES ('Asus Ultimate Gaming Mice', 'Optical', 'USB Wireless')");
 
-            // Inserting tuples to accessories relationships
             OCICommit($db_conn);
         }
 
