@@ -3,7 +3,7 @@
   Modified by Simona Radu
   Modified by Jessica Wong (2018-06-22)
   This file shows the very basics of how to execute PHP commands
-  on Oracle.  
+  on Oracle.
   Specifically, it will drop a table, create a table, insert values
   update values, and then query for values
  
@@ -13,7 +13,7 @@
   All OCI commands are commands to the Oracle libraries
   To get the file to work, you must place it somewhere where your
   Apache server can run it, and you must rename it to have a ".php"
-  extension.  You must also change the username and password on the 
+  extension.  You must also change the username and password on the
   OCILogon below to be your ORACLE username and password -->
 
 <html>
@@ -58,6 +58,37 @@
 
         <hr />
 
+        <h2>Select Price Range in Motherboard Table</h2>
+        <p>The values are case sensitive and if you enter in the wrong case, the select statement will not do anything.</p>
+
+        <form method="GET" action="oracle-project.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="selectTupleRequest" name="selectTupleRequest">
+            minPrice: <input type="integer" name="var1"> <br /><br />
+            maxPrice: <input type="integer" name="var2"> <br /><br />
+
+            <input type="submit" value="Select" name="selectTuples"></p>
+        </form>
+
+        <hr />
+
+        <h2>Find specfic customer email in Joint Table</h2>
+        <p>The values are case sensitive and if you enter.</p>
+
+        <form method="GET" action="oracle-project.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="findTupleRequest" name="findTupleRequest">
+            minPrice: <input type="integer" name="var"> <br /><br />
+
+            <input type="submit" value="Find" name="findTuples"></p>
+        </form>
+
+        <hr />
+        
+        <h2>List Customer having bought more than one item(Accessory Excluded)</h2>
+        <form method="GET" action="oracle-project.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="listHavingRequest" name="listHavingRequest">
+            <input type="submit" name="listHaving"></p>
+        </form>
+
         <h2>Count the Tuples in DemoTable</h2>
         <form method="GET" action="oracle-project.php"> <!--refresh page when submitted-->
             <input type="hidden" id="countTupleRequest" name="countTupleRequest">
@@ -71,7 +102,7 @@
         </form>
 
         <?php
-		//this tells the system that it's no longer just parsing html; it's now parsing PHP
+        //this tells the system that it's no longer just parsing html; it's now parsing PHP
 
         $success = True; //keep track of errors so it redirects the page only if there are no errors
         $db_conn = NULL; // edit the login credentials in connectToDB()
@@ -89,7 +120,7 @@
             //echo "<br>running ".$cmdstr."<br>";
             global $db_conn, $success;
 
-            $statement = OCIParse($db_conn, $cmdstr); 
+            $statement = OCIParse($db_conn, $cmdstr);
             //There are a set of comments at the end of the file that describe some of the OCI specific functions and how they work
 
             if (!$statement) {
@@ -107,17 +138,17 @@
                 $success = False;
             }
 
-			return $statement;
-		}
+            return $statement;
+        }
 
         function executeBoundSQL($cmdstr, $list) {
             /* Sometimes the same statement will be executed several times with different values for the variables involved in the query.
-		In this case you don't need to create the statement several times. Bound variables cause a statement to only be
-		parsed once and you can reuse the statement. This is also very useful in protecting against SQL injection. 
-		See the sample code below for how this function is used */
+        In this case you don't need to create the statement several times. Bound variables cause a statement to only be
+        parsed once and you can reuse the statement. This is also very useful in protecting against SQL injection.
+        See the sample code below for how this function is used */
 
-			global $db_conn, $success;
-			$statement = OCIParse($db_conn, $cmdstr);
+            global $db_conn, $success;
+            $statement = OCIParse($db_conn, $cmdstr);
 
             if (!$statement) {
                 echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
@@ -132,7 +163,7 @@
                     //echo "<br>".$bind."<br>";
                     OCIBindByName($statement, $bind, $val);
                     unset ($val); //make sure you do not remove this. Otherwise $val will remain in an array object wrapper which will not be recognized by Oracle as a proper datatype
-				}
+                }
 
                 $r = OCIExecute($statement, OCI_DEFAULT);
                 if (!$r) {
@@ -151,7 +182,7 @@
             echo "<tr><th>ID</th><th>Name</th><th>Email</th></tr>";
 
             while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-                echo "<tr><td>" . $row["Customer_ID"] . "</td><td>" . $row["Full_Name"] . "</td><td>" . $row["Email"] . "</td></tr>"; //or just use "echo $row[0]" 
+                echo "<tr><td>" . $row[customerID] . "</td><td>" . $row["Full_Name"] . "</td><td>" . $row["Email"] . "</td></tr>"; //or just use "echo $row[0]"
                 // echo $row[0];
             }
 
@@ -161,9 +192,9 @@
         function connectToDB() {
             global $db_conn;
 
-            // Your username is ora_(CWL_ID) and the password is a(student number). For example, 
-			// ora_platypus is the username and a12345678 is the password.
-            $db_conn = OCILogon("ora_yuta123", "a13449731", "dbhost.students.cs.ubc.ca:1522/stu");
+            // Your username is ora_(CWL_ID) and the password is a(student number). For example,
+            // ora_platypus is the username and a12345678 is the password.
+            $db_conn = OCILogon("ora_sonyingc", "a39025374", "dbhost.students.cs.ubc.ca:1522/stu");
 
             if ($db_conn) {
                 debugAlertMessage("Database is Connected");
@@ -193,6 +224,44 @@
             executePlainSQL("UPDATE Customer SET EMAIL= '" . $new_name . "' WHERE EMAIL='" . $old_name . "'");
             OCICommit($db_conn);
         }
+        
+        function handleSelectRequest() {
+            global $db_conn;
+
+            $var1 = $_GET['var1'];
+            $var2 = $_GET['var2'];
+            
+            $result = executePlainSQL("SELECT * FROM Motherboard WHERE price > $var1 AND price < $var2");
+            echo "<br>Retrieved data from table Motherboard:<br>";
+            echo "<table>";
+            echo "<tr><th>Model_Name</th><th>Price</th><th>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" . $row["Motherboard_Model_Name"] . "</td><td>" . $row["PRICE"] . "</td><td>"; //or just use "echo $row[0]"
+                // echo $row[0];
+            }
+
+            echo "</table>";
+        }
+            
+            function handleFindRequest() {
+                global $db_conn;
+
+                $var = $_GET['var'];
+                
+                $result = executePlainSQL("SELECT DISTINCT c.name, c.email FROM Purchases_Computer_Customer pcc, Customer c, Connects_Motherboard_Computer cmc WHERE pcc.computerModelName = cmc.computerModelName AND pcc.customerID = c.customerID AND cmc.price > $var");
+                
+                echo "<br>Retrieved data from joint table:<br>";
+                echo "<table>";
+                echo "<tr><th>Name</th><th>Email</th><th>";
+
+                while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                    echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["EMAIL"] . "</td><td>"; //or just use "echo $row[0]"
+                    // echo $row[0];
+                }
+
+                echo "</table>";
+            }
 
         function handleResetRequest() {
             global $db_conn;
@@ -226,54 +295,54 @@
             echo "<br> creating new tables <br>";
              // Computer and Motherboard DDLs
              executePlainSQL('CREATE TABLE Motherboard(
-                "Motherboard_Model_Name"  CHAR(100) PRIMARY KEY, 
-                "Price"                   FLOAT NOT NULL
+                "Motherboard_Model_Name"  CHAR(100) PRIMARY KEY,
+                price                      FLOAT NOT NULL
             )');
             executePlainSQL('CREATE TABLE CPU(
-	            "CPU_Model_Name"		CHAR(100)	PRIMARY KEY,
-	            "Price" 				FLOAT		NOT NULL,
-	            "Frequency"			FLOAT		NOT NULL,
-	            "Core"				INTEGER	    NOT NULL
+                "CPU_Model_Name"        CHAR(100)    PRIMARY KEY,
+                "Price"                 FLOAT        NOT NULL,
+                "Frequency"            FLOAT        NOT NULL,
+                "Core"                INTEGER        NOT NULL
             )');
             // executePlainSQL('CREATE TABLE RAM(
-            //     "RAM_Model_Name"		CHAR(100)	PRIMARY KEY,
-            //     "Price" 				FLOAT		NOT NULL,
-            //     "Frequency"			FLOAT		NOT NULL,
-            //     "Memory_Types"		CHAR(100)	NOT NULL,
-            //     "Size"				INTEGER	    NOT NULL
+            //     "RAM_Model_Name"        CHAR(100)    PRIMARY KEY,
+            //     "Price"                 FLOAT        NOT NULL,
+            //     "Frequency"            FLOAT        NOT NULL,
+            //     "Memory_Types"        CHAR(100)    NOT NULL,
+            //     "Size"                INTEGER        NOT NULL
             // )');
             executePlainSQL('CREATE TABLE RAM_Memory(
-                "Memory_Types"		CHAR(100)	PRIMARY KEY,
-                "Frequency"			FLOAT 	    NOT NULL
+                "Memory_Types"        CHAR(100)    PRIMARY KEY,
+                "Frequency"            FLOAT         NOT NULL
             )');
             executePlainSQL('CREATE TABLE RAM_Model(
-                "RAM_Model_Name"		CHAR(100)	PRIMARY KEY,
-                "Price" 				FLOAT		NOT NULL,
-                "Memory_Types"		CHAR(100)	NOT NULL,
-                "Size"				INTEGER	    NOT NULL,
+                "RAM_Model_Name"        CHAR(100)    PRIMARY KEY,
+                "Price"                 FLOAT        NOT NULL,
+                "Memory_Types"        CHAR(100)    NOT NULL,
+                "Size"                INTEGER        NOT NULL,
                 FOREIGN KEY ("Memory_Types") REFERENCES RAM_Memory
                     ON DELETE CASCADE
             )');
             executePlainSQL('CREATE TABLE Storage(
-                "Storage_Model_Name"	CHAR(100)	PRIMARY KEY,
-                "Price" 				FLOAT		NOT NULL,
-                "Size"				INTEGER	    NOT NULL
+                "Storage_Model_Name"    CHAR(100)    PRIMARY KEY,
+                "Price"                 FLOAT        NOT NULL,
+                "Size"                INTEGER        NOT NULL
             )');
             executePlainSQL('CREATE TABLE HDD(
-                "Storage_Model_Name"		CHAR(100)	PRIMARY KEY,
-                "RPM"				        INTEGER 	NOT NULL,
+                "Storage_Model_Name"        CHAR(100)    PRIMARY KEY,
+                "RPM"                        INTEGER     NOT NULL,
                 FOREIGN KEY ("Storage_Model_Name") REFERENCES Storage
                     ON DELETE CASCADE
             )');
             executePlainSQL('CREATE TABLE SSD(
-                "Storage_Model_Name"		 CHAR(100)	PRIMARY KEY,
-                "Interface"			     CHAR(100)	NOT NULL,
+                "Storage_Model_Name"         CHAR(100)    PRIMARY KEY,
+                "Interface"                 CHAR(100)    NOT NULL,
                 FOREIGN KEY ("Storage_Model_Name") REFERENCES Storage
                     ON DELETE CASCADE
             )');
             executePlainSQL('CREATE TABLE Mounts_Storage_Motherboard(
-                "Storage_Model_Name" 		 CHAR(100),
-                "Motherboard_Model_Name"	 CHAR(100),
+                "Storage_Model_Name"          CHAR(100),
+                "Motherboard_Model_Name"     CHAR(100),
                 PRIMARY KEY("Storage_Model_Name", "Motherboard_Model_Name"),
                 FOREIGN KEY("Storage_Model_Name") REFERENCES Storage,
                 FOREIGN KEY("Motherboard_Model_Name") REFERENCES Motherboard
@@ -281,99 +350,99 @@
             )');
 
             executePlainSQL('CREATE TABLE Controls_CPU_Motherboard(
-                "CPU_Model_Name" 		     CHAR(100),
-                "Motherboard_Model_Name"	 CHAR(100),
+                "CPU_Model_Name"              CHAR(100),
+                "Motherboard_Model_Name"     CHAR(100),
                 PRIMARY KEY("CPU_Model_Name", "Motherboard_Model_Name"),
                 FOREIGN KEY("CPU_Model_Name") REFERENCES CPU,
                 FOREIGN KEY("Motherboard_Model_Name") REFERENCES Motherboard
             )');
             executePlainSQL('CREATE TABLE Inserts_RAM_Motherboard(
-                "RAM_Model_Name" 		     CHAR(100),
-                "Motherboard_Model_Name"	 CHAR(100),
+                "RAM_Model_Name"              CHAR(100),
+                "Motherboard_Model_Name"     CHAR(100),
                 PRIMARY KEY("RAM_Model_Name", "Motherboard_Model_Name"),
                 FOREIGN KEY("RAM_Model_Name") REFERENCES RAM_Model,
                 FOREIGN KEY("Motherboard_Model_Name") REFERENCES Motherboard
             )');
             executePlainSQL('CREATE TABLE Connects_Motherboard_Computer(
-                "Motherboard_Model_Name"	 CHAR(100)   NOT NULL,
-                "Computer_Model_Name"	     CHAR(100),
-                "Operating_System"		 CHAR(100)		NOT NULL,
-                "Size"				     CHAR(100)		NOT NULL,
-                "Price"				     FLOAT		    NOT NULL,
-                PRIMARY KEY("Motherboard_Model_Name", "Computer_Model_Name"),
+                "Motherboard_Model_Name"     CHAR(100)   NOT NULL,
+                computerModelName             CHAR(100),
+                "Operating_System"             CHAR(100)        NOT NULL,
+                "Size"                         CHAR(100)        NOT NULL,
+                price                        FLOAT            NOT NULL,
+                PRIMARY KEY("Motherboard_Model_Name", computerModelName),
                 FOREIGN KEY("Motherboard_Model_Name") REFERENCES Motherboard
             )');
 
             // Customer SQL DDLs
             executePlainSQL('CREATE TABLE Customer(
-                "Customer_ID"		CHAR(100)	    PRIMARY KEY,
-                "Full_Name"		CHAR(100)	NOT NULL,
-                "Email"			CHAR(100)	NOT NULL
+                customerID        CHAR(100)        PRIMARY KEY,
+                name                CHAR(100)    NOT NULL,
+                email                CHAR(100)    NOT NULL
             )');
             // executePlainSQL('CREATE TABLE GPU(
-            //     "GPU_Model_Name" 	CHAR(100)	PRIMARY KEY,
-            //     "CUDA_core"		INTEGER	NOT NULL,
-            //     "Frequency"		FLOAT		NOT NULL,
-            //     "Price"			FLOAT		NOT NULL
+            //     "GPU_Model_Name"     CHAR(100)    PRIMARY KEY,
+            //     "CUDA_core"        INTEGER    NOT NULL,
+            //     "Frequency"        FLOAT        NOT NULL,
+            //     "Price"            FLOAT        NOT NULL
             // )');
             executePlainSQL('CREATE TABLE GPU_CUDACore(
-                "CUDA_core"			INTEGER	PRIMARY KEY,
-                "Frequency"			FLOAT 	NOT NULL
+                "CUDA_core"            INTEGER    PRIMARY KEY,
+                "Frequency"            FLOAT     NOT NULL
             )');
             executePlainSQL('CREATE TABLE GPU_Model(
-                "GPU_Model_Name" 	CHAR(100)	PRIMARY KEY,
-                "CUDA_core"		INTEGER	NOT NULL,
-                "Price"			FLOAT		NOT NULL,
+                "GPU_Model_Name"     CHAR(100)    PRIMARY KEY,
+                "CUDA_core"        INTEGER    NOT NULL,
+                "Price"            FLOAT        NOT NULL,
                 FOREIGN KEY ("CUDA_core") REFERENCES GPU_CUDACore
                     ON DELETE CASCADE
             )');
             executePlainSQL('CREATE TABLE Mounts_GPU_Computer(
-                "Computer_Model_Name"	    CHAR(100),
-                "Motherboard_Model_Name"    CHAR(100),    
-                "GPU_Model_Name"		    CHAR(100),
-                PRIMARY KEY("Computer_Model_Name", "Motherboard_Model_Name", "GPU_Model_Name"),
-                FOREIGN KEY("Computer_Model_Name", "Motherboard_Model_Name") REFERENCES Connects_Motherboard_Computer,
+                computerModelName        CHAR(100),
+                "Motherboard_Model_Name"    CHAR(100),
+                "GPU_Model_Name"            CHAR(100),
+                PRIMARY KEY(computerModelName, "Motherboard_Model_Name", "GPU_Model_Name"),
+                FOREIGN KEY(computerModelName, "Motherboard_Model_Name") REFERENCES Connects_Motherboard_Computer,
                 FOREIGN KEY("GPU_Model_Name") REFERENCES GPU_Model
             )');
             executePlainSQL('CREATE TABLE Purchases_Computer_Customer(
-                "Computer_Model_Name"	CHAR(100),
                 "Motherboard_Model_Name"CHAR(100),
-                "Customer_ID"			CHAR(100),
-                "OrderID"			    INTEGER,
-                PRIMARY KEY("Computer_Model_Name", "Motherboard_Model_Name", "Customer_ID", "OrderID"),
-                FOREIGN KEY("Computer_Model_Name", "Motherboard_Model_Name") REFERENCES Connects_Motherboard_Computer,
-                FOREIGN KEY("Customer_ID") REFERENCES Customer
+                computerModelName   CHAR(100),
+                customerID          CHAR(100),
+                "OrderID"               INTEGER,
+                PRIMARY KEY("Motherboard_Model_Name", computerModelName, customerID, "OrderID"),
+                FOREIGN KEY("Motherboard_Model_Name", computerModelName) REFERENCES Connects_Motherboard_Computer,
+                FOREIGN KEY(customerID) REFERENCES Customer
             )');
             
             // Accessories DDLs
             executePlainSQL('CREATE TABLE Accessory(
-                "Accessory_Model_Name"	CHAR(100)	PRIMARY KEY,
-                "Price" 				    FLOAT		NOT NULL
+                "Accessory_Model_Name"    CHAR(100)    PRIMARY KEY,
+                "Price"                     FLOAT        NOT NULL
             )');
 
             executePlainSQL('CREATE TABLE Monitor(
-                "Accessory_Model_Name"	CHAR(100)	PRIMARY KEY,
-                "Refresh_Rate"			CHAR(100)	NOT NULL,
-                "Resolution"			    CHAR(100)	NOT NULL,
+                "Accessory_Model_Name"    CHAR(100)    PRIMARY KEY,
+                "Refresh_Rate"            CHAR(100)    NOT NULL,
+                "Resolution"                CHAR(100)    NOT NULL,
                 FOREIGN KEY ("Accessory_Model_Name") REFERENCES Accessory
                     ON DELETE CASCADE
             )');
 
             executePlainSQL('CREATE TABLE Mouse(
-                "Accessory_Model_Name"    CHAR(100)	PRIMARY KEY,
-                "Sensor_Type"			    CHAR(100)	NOT NULL,
-                "Connection_Type"		    CHAR(100)	NOT NULL,
+                "Accessory_Model_Name"    CHAR(100)    PRIMARY KEY,
+                "Sensor_Type"                CHAR(100)    NOT NULL,
+                "Connection_Type"            CHAR(100)    NOT NULL,
                 FOREIGN KEY ("Accessory_Model_Name") REFERENCES Accessory
                     ON DELETE CASCADE
             )');
 
             executePlainSQL('CREATE TABLE Purchases_Accessory_Customer(
-                "Accessory_Model_Name"	    CHAR(100),
-                "Customer_ID"			    CHAR(100),
-                "OrderID"			        INTEGER,
-                PRIMARY KEY("Accessory_Model_Name", "Customer_ID", "OrderID"),
+                "Accessory_Model_Name"        CHAR(100),
+                customerID                CHAR(100),
+                "OrderID"                    INTEGER,
+                PRIMARY KEY("Accessory_Model_Name", customerID, "OrderID"),
                 FOREIGN KEY("Accessory_Model_Name") REFERENCES Accessory,
-                FOREIGN KEY("Customer_ID") REFERENCES Customer
+                FOREIGN KEY(customerID) REFERENCES Customer
             )');
             
             // //TODO: Remember FK must refer to a existing value in the parent table
@@ -384,6 +453,9 @@
             executePlainSQL("INSERT INTO Motherboard VALUES ('Asus Prime Z390-A', 228)");
             executePlainSQL("INSERT INTO Motherboard VALUES ('MSI Creator TRX40 Motherboard', 945)");
             executePlainSQL("INSERT INTO Motherboard VALUES ('GIGABYTE Z490 AORUS Master', 516)");
+            //adding a new motherboard for apple computer so that a customer buys two computers
+            executePlainSQL("INSERT INTO Motherboard VALUES ('Apple Motherboard', 699)");
+
             
             executePlainSQL("INSERT INTO CPU VALUES ('AMD Ryzen 7 3800X', 495, 3.9 , 8)");
             executePlainSQL("INSERT INTO CPU VALUES ('Intel Core i7-9700K', 455, 4.9 , 8)");
@@ -456,6 +528,8 @@
             executePlainSQL("INSERT INTO Connects_Motherboard_Computer VALUES ('Asus Prime Z390-A', 'Acer AspireTC-895-UA91', 'Windows 10Home 64 bit', 'Mid Tower', 430)");
             executePlainSQL("INSERT INTO Connects_Motherboard_Computer VALUES ('MSI Creator TRX40 Motherboard', 'Apple iMac21-Inch', 'MacOS X', '528×450×175', 1400)");
             executePlainSQL("INSERT INTO Connects_Motherboard_Computer VALUES ('GIGABYTE Z490 AORUS Master', 'CORSAIR ONEi140', 'Windows 10Home 64 bit', 'Full Tower', 4500)");
+            //adding a new computer so that one customer buys two computers
+            executePlainSQL("INSERT INTO Connects_Motherboard_Computer VALUES ('Apple Motherboard', 'Macbook Pro M1', 'MacOS X', '13 inches', 1299)");
             
             // Inserting tuples to customer table
             executePlainSQL("INSERT INTO Customer VALUES ('1','Bob', 'bob@gmail.com')");
@@ -489,22 +563,24 @@
             executePlainSQL("INSERT INTO Purchases_Computer_Customer VALUES ('Asus Prime Z390-A', 'Acer AspireTC-895-UA91', '3', 12)");
             executePlainSQL("INSERT INTO Purchases_Computer_Customer VALUES ('MSI Creator TRX40 Motherboard', 'Apple iMac21-Inch', '4', 13)");
             executePlainSQL("INSERT INTO Purchases_Computer_Customer VALUES ('GIGABYTE Z490 AORUS Master', 'CORSAIR ONEi140', '5', 14)");
+            //adding one computer to current customer so that we can test our aggregation having
+            executePlainSQL("INSERT INTO Purchases_Computer_Customer VALUES ('Apple Motherboard', 'Macbook Pro M1', '5', 15)");
 
             // Inserting tuples to accessory
             executePlainSQL("INSERT INTO Accessory VALUES ('Microsoft Wireless Mobile Microsoft 15.95 Mouse 1850 -Black- U7Z-00002', '15.95')");
             executePlainSQL("INSERT INTO Accessory VALUES ('Razer DeathAdder Essential Gaming Mouse: 6400 DPI Optical Sensor', '39.99')");
-            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Pro Display XDR Standard Glass', '6499')");
-            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Pro Display XDR Nano-texture glass', '7499')");
-            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Magic Keyboard', '99')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Pro Display XDR Standard Glass', '6499.99')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Pro Display XDR Nano-texture glass', '7499.99')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Magic Keyboard', '99.99')");
 
-            executePlainSQL("INSERT INTO Accessory VALUES ('Dell 27 Inch 4k Monitor 2020', '1599')");
-            executePlainSQL("INSERT INTO Accessory VALUES ('Samsung Ultra 8k Monitor 2020', '2099')");
-            executePlainSQL("INSERT INTO Accessory VALUES ('Asus 4k Pro Monitor', '1599')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Dell 27 Inch 4k Monitor 2020', '1599.99')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Samsung Ultra 8k Monitor 2020', '2099.99')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Asus 4k Pro Monitor', '1599.99')");
 
-            executePlainSQL("INSERT INTO Accessory VALUES ('Microsoft Wireless Mobile Mouse 1850 - Black - U7Z-00002', '10')");
-            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Magic Mouse', '199')");
-            executePlainSQL("INSERT INTO Accessory VALUES ('Logitech Gaming Mouse', '150')");
-            executePlainSQL("INSERT INTO Accessory VALUES ('Asus Ultimate Gaming Mice', '300')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Microsoft Wireless Mobile Mouse 1850 - Black - U7Z-00002', '10.00')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Apple Magic Mouse', '199.99')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Logitech Gaming Mouse', '150.00')");
+            executePlainSQL("INSERT INTO Accessory VALUES ('Asus Ultimate Gaming Mice', '300.00')");
 
             // Inserting tuples to Monitor
             executePlainSQL("INSERT INTO Monitor VALUES ('Dell 27 Inch 4k Monitor 2020', '120 Hz', '4k')");
@@ -546,6 +622,23 @@
             executeBoundSQL("insert into Customer values (:bind1, :bind2, :bind3)", $alltuples);
             OCICommit($db_conn);
         }
+        
+        function handleListRequest() {
+            global $db_conn;
+            
+            $result = executePlainSQL("SELECT c.name, count(*) FROM Purchases_Computer_Customer pcc, Customer c WHERE c.customerID = pcc.customerID GROUP BY c.name HAVING count(*) > 1");
+            
+            echo "<br>Retrieved data from Purchases_Computer_Customer table:<br>";
+            echo "<table>";
+            echo "<tr><th>Customer Name</th><th>Count</th><th>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["COUNT(*)"] . "</td><td>"; //or just use "echo $row[0]"
+                // echo $row[0];
+            }
+
+            echo "</table>";
+        }
 
         function handleCountRequest() {
             global $db_conn;
@@ -565,7 +658,7 @@
         }
 
         // HANDLE ALL POST ROUTES
-	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
+    // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handlePOSTRequest() {
             if (connectToDB()) {
                 if (array_key_exists('resetTablesRequest', $_POST)) {
@@ -581,27 +674,42 @@
         }
 
         // HANDLE ALL GET ROUTES
-	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
+    // A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handleGETRequest() {
             if (connectToDB()) {
+                if (array_key_exists('selectTuples', $_GET)) {
+                    handleSelectRequest();
+                }
+                if (array_key_exists('findTuples', $_GET)) {
+                    handleFindRequest();
+                }
                 if (array_key_exists('countTuples', $_GET)) {
                     handleCountRequest();
                 }
                 if (array_key_exists('displayTuples', $_GET)) {
                     handleDisplayRequest();
                 }
+                if (array_key_exists('listHaving', $_GET)) {
+                    handleListRequest();
+                }
                 disconnectFromDB();
             }
         }
 
-		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
+        if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
             handlePOSTRequest();
         } else if (isset($_GET['countTupleRequest'])) {
             handleGETRequest();
         } else if (isset($_GET['displayTupleRequest'])) {
             handleGETRequest();
+        } else if (isset($_GET['selectTupleRequest'])) {
+            handleGETRequest();
+        } else if (isset($_GET['findTupleRequest'])) {
+            handleGETRequest();
+        } else if (isset($_GET['listHavingRequest'])) {
+            handleGETRequest();
         }
-		?>
-	</body>
+        ?>
+    </body>
 </html>
 
